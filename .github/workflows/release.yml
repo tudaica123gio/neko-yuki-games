@@ -1,0 +1,33 @@
+name: Phat hanh goi tai nguyen
+
+# Tu dong chay moi khi co thay doi trong games/ tren nhanh main,
+# hoac bam "Run workflow" trong tab Actions.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'games/**'
+      - 'tools/**'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-assets
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dong goi
+        run: python3 tools/build_packs.py --out dist
+
+      - name: Phat hanh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash tools/publish.sh dist

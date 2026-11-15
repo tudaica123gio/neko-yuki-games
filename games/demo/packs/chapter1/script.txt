@@ -1,0 +1,2 @@
+Chương 1
+Đây là gói demo. Game chỉ tải gói này khi người chơi vào chương 1.
