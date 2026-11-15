@@ -1,2 +1,3 @@
 Chương 2
 Gói này chỉ được tải khi người chơi vào chương 2.
+Khi nội dung gói thay đổi, game tự nhận ra và tải bản mới.
