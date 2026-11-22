@@ -1,0 +1,33 @@
+# Copies the Android build tools of the runner (aapt2, d8, zipalign, apksigner + android.jar) into a DRAFT release,
+# so the DDLC Java ME port can be packaged as an APK outside GitHub. Runs on pushes to the android-build branch.
+name: android-tools
+on:
+  push:
+    branches: [android-build]
+    paths: [.github/workflows/android-tools.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pack the SDK pieces
+        run: |
+          set -e
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          ls "$SDK/build-tools" "$SDK/platforms"
+          BT=$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)
+          PL=$(ls -d "$SDK"/platforms/android-* | grep -E 'android-[0-9]+$' | sort -V | tail -1)
+          mkdir -p t
+          cp -r "$BT" t/build-tools
+          cp "$PL/android.jar" t/android.jar
+          echo "$BT $PL" > t/VERSION
+          tar czf android-tools.tgz -C t .
+          ls -la android-tools.tgz
+      - name: Draft release with the tools
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete tools-tmp -y -R "$GITHUB_REPOSITORY" 2>/dev/null || true
+          gh release create tools-tmp android-tools.tgz --draft --title tools-tmp --notes "temporary" -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"
