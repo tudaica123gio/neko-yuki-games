@@ -1,4 +1,4 @@
-# Temporary: installs test.apk on an Android emulator, taps through, saves screenshots + logcat to a draft release.
+# Temporary: installs the APK on an Android emulator, taps through, saves screenshots + logcat to a draft release.
 name: apk-smoke
 on:
   push:
@@ -8,50 +8,33 @@ permissions:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
-      - name: Get the APK
-        run: git clone -q --depth 1 -b apk-smoke "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}" src && cp src/test.apk .
+      - uses: actions/checkout@v4
+      - name: Join the APK
+        run: cat test.apk.part* > test.apk && ls -la test.apk && mkdir -p out
       - name: KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
       - name: Emulator
-        run: |
-          set -x
-          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"; SM=$(ls $SDK/cmdline-tools/*/bin/sdkmanager | head -1); AM=$(dirname $SM)/avdmanager
-          yes | $SM --install "emulator" "platform-tools" "system-images;android-34;google_apis;x86_64" > /dev/null
-          echo no | $AM create avd -n t -k "system-images;android-34;google_apis;x86_64" -d pixel_6 --force
-          nohup $SDK/emulator/emulator -avd t -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -memory 4096 > emu.log 2>&1 &
-          ADB=$SDK/platform-tools/adb
-          $ADB wait-for-device
-          for i in $(seq 1 90); do [ "$($ADB shell getprop sys.boot_completed | tr -d '\r')" = 1 ] && break; sleep 5; done
-          $ADB shell settings put global window_animation_scale 0; $ADB shell settings put global transition_animation_scale 0
-          $ADB shell input keyevent 82
-          $ADB install -r test.apk
-          $ADB logcat -c
-          $ADB shell am start -n com.nekoyuki.ddlc.dev/com.nekoyuki.ddlc.MainActivity
-          mkdir -p out
-          shot() { sleep $2; $ADB exec-out screencap -p > out/$1.png; }
-          shot 01_start 25
-          shot 02_later 15
-          $ADB shell wm size > out/size.txt
-          for i in 1 2 3; do $ADB shell input tap 1200 540; sleep 4; done
-          shot 03_tapped 3
-          $ADB shell input keyevent 4; shot 04_back 4
-          $ADB shell input tap 1200 540; shot 05_tap 5
-          $ADB shell dumpsys activity activities | grep -i "mResumedActivity\|topResumed" > out/activity.txt || true
-          $ADB logcat -d > out/logcat.txt
-          grep -iE "AndroidRuntime|FATAL|Exception|System.err|ddlc" out/logcat.txt | head -400 > out/errors.txt || true
+        timeout-minutes: 30
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: google_apis
+          profile: pixel_4
+          ram-size: 4096M
+          disk-size: 4096M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          disable-animations: true
+          script: bash smoke.sh
       - name: Results
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           ls -la out || true
+          [ -n "$(ls out)" ] || echo none > out/none.txt
           gh release create "smoke-${GITHUB_RUN_ID}" out/* --draft --title smoke --notes temp -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"
-      - name: Remove the tools draft
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release delete tools-tmp -y --cleanup-tag -R "$GITHUB_REPOSITORY" || true
