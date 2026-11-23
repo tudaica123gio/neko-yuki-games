@@ -27,6 +27,11 @@ nút Tự tối ưu cho hệ điều hành đang chọn, độ phân giải, hi�
 Phần nhận diện máy và chọn cấu hình nằm trong `shared/device/NekoDevice.java`, cài vào game bằng
 `python3 tools/install_device.py <thư mục src của game> [package]`. Chi tiết: [shared/device/README.md](shared/device/README.md).
 
+## Khoá chống sửa dùng chung
+
+Game bị sửa (xoá credits Neko Yuki, đổi dữ liệu hoặc tài nguyên) thì hiện phòng khoá "Just Neko Yuki" và không cho chơi.
+Mỗi tài nguyên của Neko Yuki mang dấu bản quyền. Chi tiết và cách gắn vào game: [shared/guard/README.md](shared/guard/README.md).
+
 ## Cấu trúc thư mục
 
 ```
@@ -38,7 +43,8 @@ games/
         script.txt
       chapter2/
 shared/credits/             ảnh đại diện và link dùng cho màn hình credits
-shared/device/              module nhận diện máy + tự tối ưu dùng chung (NekoDevice)
+shared/device/              module nhận diện máy + tự tối ưu dùng chung (NekoDevice) + bảng model máy
+shared/guard/               khoá chống sửa + phòng khoá + ảnh Neko Yuki (NekoGuard)
 client/android-pc/          code tải tài nguyên cho Android và PC
 client/j2me/                code tải tài nguyên cho J2ME
 tools/                      script đóng gói (tự chạy, không cần đụng tới)
@@ -136,6 +142,7 @@ thức trên Facebook, YouTube và Discord.
 bash tests/run.sh          # tải tài nguyên
 bash tests/run_device.sh   # nhận diện máy + tự tối ưu
 python3 tools/check_models.py   # bảng model máy
+bash tests/run_guard.sh         # khoá chống sửa + phòng khoá
 ```
 
 Lệnh này đóng gói thử, dựng máy chủ giả lập GitHub, rồi chạy cả hai bản code tải:

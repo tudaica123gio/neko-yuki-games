@@ -1,0 +1,62 @@
+// FNaF 1 v4.7 (FNaF 2: đổi Fnaf -> F2). Đã thử: biên dịch, make.py, kiểm tra CLDC 1.0, chụp màn 128x160 ... 1872x864.
+// 1) src/FnafCanvas.java, trong paint(Graphics gr), ngay trước dòng 'FnafG g2 = view.begin(gr);' thêm khối dưới;
+//    thêm 'import javax.microedition.lcdui.Image;' nếu chưa có.
+// 2) make.py, trong vòng build bản người dùng, sau dòng shutil.copy(B + '/icon/icon.png', pk) thêm:
+//        if os.path.isdir('res_guard'): shutil.copytree('res_guard/ny', pk + '/ny')   # ảnh phòng khoá, ngoài data.bin
+//    và chép shared/guard/art/nekoyuki_halfbody_{96,128,176,240,320}.png vào res_guard/ny/.
+// 3) Chạy python3 buildfont.py (font bitmap có thêm dấu ©) rồi python3 make.py.
+
+        if (state == ST_LOCK) {           // phòng khoá Neko Yuki: vẽ thẳng lên màn thật, không qua khung ảo
+            paintGuard(gr, w, h);
+            return;
+        }
+        FnafG g2 = view.begin(gr);
+        paintGame(g2);
+        view.end(gr);
+    }
+
+    // ------------------------------------------------------------------ phòng khoá (module chung NekoGuard)
+    Image guardImg;
+    int guardFor;
+
+    void paintGuard(Graphics gr, int w, int h) {
+        NekoGuard.original = "Scott Cawthon";
+        NekoGuard.en = FnafSave.lang == 1;
+        NekoGuard.trip("FnafPack");
+        if (guardImg == null || guardFor != w * 10000 + h) {
+            guardFor = w * 10000 + h;
+            guardImg = null;
+            int[] hs = {96, 128, 176, 240, 320};
+            int target = w > h ? h * 78 / 100 : h * 50 / 100, pick = 0;
+            for (int i = 0; i < hs.length; i++) if (hs[i] <= target) pick = hs[i];
+            if (pick > 0) {
+                try {
+                    // ảnh nằm ngoài data.bin (thư mục /ny của jar) để vẫn hiện khi gói tài nguyên bị sửa
+                    guardImg = Image.createImage("/ny/nekoyuki_halfbody_" + pick + ".png");
+                } catch (Throwable t) {
+                    guardImg = null;
+                }
+            }
+        }
+        // màn lớn (J2ME Loader, APK): font hệ thống của Android đủ dấu và đủ to; màn nhỏ: font bitmap của game
+        boolean big = Math.min(w, h) >= 360;
+        NekoGuard.paint(gr, w, h, guardImg == null ? null : new Image[]{guardImg}, big ? null : guardText(fL), big ? null : guardText(fS),
+                System.currentTimeMillis());
+    }
+
+    NekoGuard.Text guardText(final FnafFont f) {
+        return new NekoGuard.Text() {
+            public int height() {
+                return f.getHeight() + 2;
+            }
+
+            public int width(String s) {
+                return f.stringWidth(s);
+            }
+
+            public void draw(Graphics g, String s, int x, int y, int rgb) {
+                f.drawRaw(g, s, x, y, rgb);
+            }
+        };
+    }
+
