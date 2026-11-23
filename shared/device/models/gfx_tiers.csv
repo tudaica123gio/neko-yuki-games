@@ -1,0 +1,6 @@
+tier,name_vi,groups,heap,fps,advice
+0,Toi gian,"S40 1st, SE JP-1, man 96x65 / 128x128, clone MTK","<= ~250 KB, JAR <= 62-64 KB",12,"MIDP 1.0, khong am thanh hoac chi beep, 1 tileset, khong back-buffer toan man"
+1,Thap,"S40 2nd (128x128 / 128x160), Siemens x65/x75, Motorola P2K, SE JP-3/JP-5","0,5-1,5 MB, JAR 125-350 KB",15,"1 back-buffer, PNG 4-bit/8-bit, 1 ban MIDI"
+2,Trung binh,"S40 3rd-6th, Asha, S40 2nd 208x208, Motorola MAGX, S60 1st/2nd, BlackBerry, UIQ","2-3 MB, JAR 1-2 MB",20,"240x320 day du, 2-3 lop parallax, MMAPI, M3G rat nhe"
+3,Cao,"SE JP-6/JP-7, LG Cookie, Samsung Star",5-6 MB,25,"hieu ung, nhieu sprite, M3G / Mascot co ban"
+4,Rat cao,"S60 3rd/5th, Symbian^3, SE JP-8.x, J2ME Loader, gia lap PC","9-64 MB, JAR khong gioi han",30,"toan bo hieu ung, 3D, do phan giai x1,5"

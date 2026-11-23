@@ -1,0 +1,14 @@
+kind,name,width,height,width_hq,height_hq,note
+runner,J2ME Loader,240,320,,,"mac dinh 240x320; co preset 320x240 (E71/E72/C3-00/Asha 201/BB), 352x416 (N80), 240x432 (Aino)"
+runner,FreeJ2ME (libretro),240,320,,,"30 fps, toi 800x480"
+runner,FreeJ2ME-Plus,240,320,,,"toi da 800, 60 fps, danh sach 128x128 den 360x640 / 640x360"
+runner,KEmulator,,,,,chon thu cong (chua co nguon ve mac dinh)
+runner,MicroEmulator,,,,,chon thu cong (chua co nguon ve mac dinh)
+android,"16:9 (720x1280, 1080x1920)",240,427,360,640,doc; choi ngang thi dao rong / cao
+android,"18:9 (720x1440, 1080x2160)",240,480,360,720,
+android,19.5:9 (1080x2340),240,520,360,780,
+android,20:9 (1080x2400),240,533,360,800,
+android,21:9 man ngoai may gap (1080x2520),240,560,360,840,
+android,man trong may gap ~5:4-4:3 (1768x2208),320,400,480,600,
+android,tablet 4:3 (1536x2048),240,320,480,640,
+android,tablet 16:10 (1200x1920),240,384,480,768,

@@ -68,6 +68,11 @@ Thêm vào đó:
 - Máy có cảm ứng thì điều khiển bằng cảm ứng, không có thì bàn phím theo cỡ màn.
 - Bố cục: ngang nếu cạnh dài gấp từ 1,2 lần, gần vuông (máy gập) là Vuông.
 
+## Danh sách Dòng máy
+
+Mục **Dòng máy** lấy từ bảng dữ liệu chung [models/](models/README.md). Bảng gồm 374 model, kèm độ phân giải,
+bộ mã phím mềm và mức đồ hoạ của từng model. Khi làm game mới, đưa bảng này vào game.
+
 ## Lưu cấu hình
 
 - Lưu lựa chọn của người chơi, không lưu kết quả tự động, để đổi máy hay cập nhật game thì Tự động vẫn tính lại.

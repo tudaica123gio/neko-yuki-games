@@ -1,0 +1,13 @@
+id,vendors,soft_left,soft_right,ok,clear,up,down,left,right,confidence,note
+N,"Nokia S40 / S60 / Symbian, Sun WTK, phan lon gia lap",-6,-7,-5,-8,-1,-2,-3,-4,A,S40 khong co phim xoa; S60 but chi -50; FreeJ2ME dung bo nay
+SE,Sony Ericsson (JP),-6,-7,-5,-8,-1,-2,-3,-4,A,"Back -11 (chua chac); tu JP-6: am luong -36/-37, camera -24/-25/-26"
+SS,Samsung,-6,-7,-5,-8,-1,-2,-3,-4,B,OK -5 moi kiem chung tren Z500
+LG,"LG (U8290, phan lon LG - suy luan)",-6,-7,-5,-16,-1,-2,-3,-4,B,"goi -10, am luong -13/-14"
+LG2,LG KG800 Chocolate,-202,-203,-5,-204,-1,-2,-3,-4,A,goi -200
+M1,Motorola RAZR / V550 / E1000 / P2K (MAGX chua kiem chung),-21,-22,-20,,-1,-6,-2,-5,A,"mui ten khac chuan; Menu -23, Goi -10"
+M2,Motorola V300 / V500 / V525,21,22,,,,,,,A,"ma DUONG, trai quy dinh MIDP"
+M3,"Motorola A1000 (UIQ, phim mem o tren)",-10,-11,,,,,,,A,
+S,Siemens,-1,-4,,,,,,,A,trung ma LEN/PHAI cua Nokia: phai tach ho so
+S2,Siemens SF65,105,106,-5,,,,,,A,ma duong
+BB,BlackBerry,,,,,,,,,B,khong co phim mem; dung phim Menu / Escape (RIM Keypad); trackball/Enter = OK
+T,May cam ung,,,,,,,,,A,"dung pointerPressed, ve nut mem tren man"

@@ -135,6 +135,7 @@ thức trên Facebook, YouTube và Discord.
 ```
 bash tests/run.sh          # tải tài nguyên
 bash tests/run_device.sh   # nhận diện máy + tự tối ưu
+python3 tools/check_models.py   # bảng model máy
 ```
 
 Lệnh này đóng gói thử, dựng máy chủ giả lập GitHub, rồi chạy cả hai bản code tải:
