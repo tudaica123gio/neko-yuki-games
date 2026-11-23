@@ -20,6 +20,13 @@ Mọi việc đóng gói và phát hành đều chạy tự động.
 Muốn tạo gói mới thì tạo thư mục mới trong `packs/`. Tên game và tên gói chỉ dùng
 chữ thường, số, dấu `-` và `_` (ví dụ `fnaf`, `night-1`, `music_hd`).
 
+## Cấu hình thiết bị dùng chung
+
+Mọi game có màn **Cấu hình thiết bị** theo một chuẩn chung: nút Tự động tối ưu, chọn hệ điều hành (có Android),
+nút Tự tối ưu cho hệ điều hành đang chọn, độ phân giải, hiệu năng, đồ hoạ, điều khiển, bố cục, cỡ chữ.
+Phần nhận diện máy và chọn cấu hình nằm trong `shared/device/NekoDevice.java`, cài vào game bằng
+`python3 tools/install_device.py <thư mục src của game> [package]`. Chi tiết: [shared/device/README.md](shared/device/README.md).
+
 ## Cấu trúc thư mục
 
 ```
@@ -31,6 +38,7 @@ games/
         script.txt
       chapter2/
 shared/credits/             ảnh đại diện và link dùng cho màn hình credits
+shared/device/              module nhận diện máy + tự tối ưu dùng chung (NekoDevice)
 client/android-pc/          code tải tài nguyên cho Android và PC
 client/j2me/                code tải tài nguyên cho J2ME
 tools/                      script đóng gói (tự chạy, không cần đụng tới)
@@ -125,7 +133,8 @@ thức trên Facebook, YouTube và Discord.
 ## Kiểm thử
 
 ```
-bash tests/run.sh
+bash tests/run.sh          # tải tài nguyên
+bash tests/run_device.sh   # nhận diện máy + tự tối ưu
 ```
 
 Lệnh này đóng gói thử, dựng máy chủ giả lập GitHub, rồi chạy cả hai bản code tải:
