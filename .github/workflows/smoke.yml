@@ -1,40 +1,58 @@
-# Temporary: installs the APK on an Android emulator, taps through, saves screenshots + logcat to a draft release.
+# Temporary: installs test.apk on Android emulators from 4.1 to 16, launches it, saves screenshots + logcat as artifacts.
 name: apk-smoke
 on:
   push:
     branches: [apk-smoke]
-permissions:
-  contents: write
 jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { api: 16, img: "default;x86", gpu: guest }
+          - { api: 19, img: "default;x86", gpu: guest }
+          - { api: 21, img: "default;x86_64", gpu: swiftshader_indirect }
+          - { api: 24, img: "default;x86_64", gpu: swiftshader_indirect }
+          - { api: 28, img: "default;x86_64", gpu: swiftshader_indirect }
+          - { api: 30, img: "google_apis;x86_64", gpu: swiftshader_indirect }
+          - { api: 34, img: "google_apis;x86_64", gpu: swiftshader_indirect }
+          - { api: 36, img: "google_apis;x86_64", gpu: swiftshader_indirect }
     steps:
       - uses: actions/checkout@v4
-      - name: Join the APK
-        run: cat test.apk.part* > test.apk && ls -la test.apk && mkdir -p out
       - name: KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
-      - name: Emulator
-        timeout-minutes: 30
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          arch: x86_64
-          target: google_apis
-          profile: pixel_4
-          ram-size: 4096M
-          disk-size: 4096M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
-          disable-animations: true
-          script: bash smoke.sh
-      - name: Results
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Emulator API ${{ matrix.api }}
         run: |
-          ls -la out || true
-          [ -n "$(ls out)" ] || echo none > out/none.txt
-          gh release create "smoke-${GITHUB_RUN_ID}" out/* --draft --title smoke --notes temp -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"
+          set -x
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"; SM=$(ls $SDK/cmdline-tools/*/bin/sdkmanager | head -1); AM=$(dirname $SM)/avdmanager
+          IMG="system-images;android-${{ matrix.api }};${{ matrix.img }}"
+          yes | $SM --install "emulator" "platform-tools" "$IMG" > /dev/null
+          echo no | $AM create avd -n t -k "$IMG" --force
+          nohup $SDK/emulator/emulator -avd t -no-window -no-audio -no-boot-anim -gpu ${{ matrix.gpu }} -no-snapshot -memory 2048 > emu.log 2>&1 &
+          ADB=$SDK/platform-tools/adb
+          mkdir -p out
+          timeout 600 $ADB wait-for-device
+          for i in $(seq 1 120); do [ "$($ADB shell getprop sys.boot_completed | tr -d '\r')" = 1 ] && break; sleep 5; done
+          sleep 20
+          $ADB shell getprop ro.build.version.release > out/android.txt
+          $ADB shell input keyevent 82 || true
+          $ADB install -r test.apk 2>&1 | tee out/install.txt
+          $ADB shell pm list packages | grep nekoyuki | tee out/pkg.txt
+          $ADB logcat -c
+          $ADB shell am start -n com.nekoyuki.ddlc/com.nekoyuki.ddlc.MainActivity 2>&1 | tee out/start.txt
+          sleep 40; $ADB exec-out screencap -p > out/01_start.png || $ADB shell screencap -p /sdcard/s.png
+          for i in 1 2 3; do $ADB shell input keyevent 66; sleep 5; done
+          sleep 10; $ADB exec-out screencap -p > out/02_later.png || true
+          $ADB shell dumpsys activity activities | grep -iE "mResumedActivity|topResumed|mFocusedActivity" > out/activity.txt || true
+          $ADB logcat -d > out/logcat.txt || true
+          grep -iE "AndroidRuntime|FATAL|VerifyError|NoSuchMethod|NoClassDef|ddlc" out/logcat.txt | head -300 > out/errors.txt || true
+          cp emu.log out/ || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-api${{ matrix.api }}
+          path: out
