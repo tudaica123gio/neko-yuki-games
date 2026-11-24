@@ -45,6 +45,7 @@ games/
 shared/credits/             ảnh đại diện và link dùng cho màn hình credits
 shared/device/              module nhận diện máy + tự tối ưu dùng chung (NekoDevice) + bảng model máy
 shared/guard/               khoá chống sửa + phòng khoá + ảnh Neko Yuki (NekoGuard)
+shared/android/             chuẩn APK cài được mọi máy Android (kiểm bằng tools/check_apk.py)
 client/android-pc/          code tải tài nguyên cho Android và PC
 client/j2me/                code tải tài nguyên cho J2ME
 tools/                      script đóng gói (tự chạy, không cần đụng tới)
@@ -143,6 +144,7 @@ bash tests/run.sh          # tải tài nguyên
 bash tests/run_device.sh   # nhận diện máy + tự tối ưu
 python3 tools/check_models.py   # bảng model máy
 bash tests/run_guard.sh         # khoá chống sửa + phòng khoá
+python3 tools/check_apk.py x.apk   # APK có cài được mọi máy không
 ```
 
 Lệnh này đóng gói thử, dựng máy chủ giả lập GitHub, rồi chạy cả hai bản code tải:
