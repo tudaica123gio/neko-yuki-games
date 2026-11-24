@@ -3,6 +3,8 @@ name: apk-smoke
 on:
   push:
     branches: [apk-smoke]
+permissions:
+  contents: write
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -39,8 +41,10 @@ jobs:
           emulator-options: -no-window -gpu ${{ matrix.gpu }} -noaudio -no-boot-anim -no-snapshot
           disable-animations: false
           script: bash smoke.sh
-      - uses: actions/upload-artifact@v4
+      - name: Results
         if: always()
-        with:
-          name: smoke-api${{ matrix.api }}
-          path: out
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -la out || true
+          gh release create "smoke-${GITHUB_RUN_ID}-api${{ matrix.api }}" out/* --draft --title smoke --notes temp -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"

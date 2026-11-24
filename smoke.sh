@@ -12,4 +12,8 @@ adb exec-out screencap -p > out/02_later.png || true
 adb shell dumpsys activity activities | grep -iE "mResumedActivity|topResumed|mFocusedActivity" > out/activity.txt || true
 adb logcat -d > out/logcat.txt || true
 grep -iE "AndroidRuntime|FATAL|VerifyError|NoSuchMethod|NoClassDef|ddlc|nekoyuki" out/logcat.txt | head -300 > out/errors.txt || true
+echo "=== RESULT android=$(cat out/android.txt) install=$(tail -1 out/install.txt) pkg=$(cat out/pkg.txt)"
+cat out/activity.txt
+echo "=== ERRORS"; grep -iE "FATAL|AndroidRuntime|VerifyError|NoSuchMethod|NoClassDef|Exception" out/errors.txt | head -40
+ls -la out
 exit 0
